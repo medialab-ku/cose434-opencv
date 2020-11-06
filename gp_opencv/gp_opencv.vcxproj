@@ -163,6 +163,20 @@
     <None Include="res\teapot\teapot.frag" />
     <None Include="res\teapot\teapot.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\calibration\0.JPG" />
+    <Image Include="res\calibration\1.JPG" />
+    <Image Include="res\calibration\2.JPG" />
+    <Image Include="res\calibration\3.JPG" />
+    <Image Include="res\calibration\4.JPG" />
+    <Image Include="res\calibration\5.JPG" />
+    <Image Include="res\calibration\6.JPG" />
+    <Image Include="res\calibration\7.JPG" />
+    <Image Include="res\calibration\8.JPG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\marker-test\test.mp4" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

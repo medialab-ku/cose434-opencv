@@ -91,6 +91,8 @@ public:
 					t[2] = tvec[2];
 					GL::MakeViewMatrix(rodrigues, t);
 
+					std::cout << t[0] << " " << t[1] << " " << t[2] << " " << std::endl;
+
 					// render teapot
 					glEnable(GL_DEPTH_TEST);
 					GL::teapotShader->use();
@@ -124,19 +126,54 @@ public:
 protected:
 	void CalibrateCamera(cv::Mat& out_cameraMatrix, cv::Mat& out_distCoeffs)
 	{
-		// ÇÊ¿äÇÒ °æ¿ì °ªÀ» ¼öÁ¤ÇÏ¿© »ç¿ëÇÏ¼¼¿ä
+		// í•„ìš”í•  ê²½ìš° ê°’ì„ ìˆ˜ì •í•˜ì—¬ ì‚¬ìš©í•˜ì„¸ìš”
 		const cv::Size NUM_CORNERS = cv::Size(8, 6);
 		const float CALIB_SQUARE_SIZE = 25; // mm
-		const int NUM_CALIB_IMAGES = 7;
-		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
+		const int NUM_CALIB_IMAGES = 9;
+		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1000, 750);
 
 		// ------------------------------------------------------------------------
 		//
-		// ÁÖ¾îÁø ÄÚµå¸¦ Âü°íÇÏ¿©
-		// Camera CalibrationÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ¿©±â¿¡ ÀÛ¼ºÇÏ¼¼¿ä
-		// °á°ú°ªÀº °¢°¢ out_cameraMatrix, out_distCoeffs ¸Å°³º¯¼ö¿¡ ´ëÀÔÇÏ¼¼¿ä
+		// ì£¼ì–´ì§„ ì½”ë“œë¥¼ ì°¸ê³ í•˜ì—¬
+		// Camera Calibrationì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì—¬ê¸°ì— ì‘ì„±í•˜ì„¸ìš”
+		// ê²°ê³¼ê°’ì€ ê°ê° out_cameraMatrix, out_distCoeffs ë§¤ê°œë³€ìˆ˜ì— ëŒ€ì…í•˜ì„¸ìš”
 		//
 		// ------------------------------------------------------------------------
+
+		std::vector<std::vector<cv::Point3f>> listOfObjectPoints;
+		std::vector<std::vector<cv::Point2f>> listOfImagePoints;
+
+		std::vector<cv::Point3f> objectPoints;
+
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				objectPoints.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		for (int i = 0; i < NUM_CALIB_IMAGES; i++)
+		{
+			std::stringstream fileName;
+			fileName << "res\\calibration\\"<< i << ".JPG";
+
+			cv::Mat image;
+			image = cv::imread(fileName.str());
+
+			std::vector<cv::Point2f> imagePoints;
+
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, imagePoints);
+
+			if (found)
+			{
+				listOfImagePoints.push_back(imagePoints);
+				listOfObjectPoints.push_back(objectPoints);
+			}
+		}
+
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+		distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+
+		double rms = cv::calibrateCamera(listOfObjectPoints, listOfImagePoints, CALIB_IMAGE_SIZE, out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
 	}
 
 	// Grab image from the video, create texture and generate mipmaps

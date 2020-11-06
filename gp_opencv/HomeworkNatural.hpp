@@ -18,7 +18,7 @@ protected:
 		cv::cvtColor(targetImage, this->targetImageGray, cv::COLOR_BGR2GRAY);
 
 		// Load your video
-		this->video.open("res\\video_natural.mp4");
+		this->video.open("res\\test\\natural-test.mp4");
 
 		// Init ORB feature
 		this->feature = cv::ORB::create();
@@ -32,33 +32,51 @@ protected:
 	{
 		/////////////////////////////////////////////////////////////////////////////////////////
 		//
-		// ¸â¹ö º¯¼ö¿Í ÁÖ¾îÁø ÄÚµå¸¦ Âü°íÇÏ¿© Feature Extraction, Feature Matching ¹× 
-		// Pose EstimationÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ÀÛ¼ºÇÏ¼¼¿ä
-		// ÇöÀç ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö´Â in_frame ¸Å°³º¯¼ö¸¦ ÅëÇØ Á¢±ÙÇÒ ¼ö ÀÖ½À´Ï´Ù
+		// ë©¤ë²„ ë³€ìˆ˜ì™€ ì£¼ì–´ì§„ ì½”ë“œë¥¼ ì°¸ê³ í•˜ì—¬ Feature Extraction, Feature Matching ë° 
+		// Pose Estimationì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±í•˜ì„¸ìš”
+		// í˜„ì¬ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ëŠ” in_frame ë§¤ê°œë³€ìˆ˜ë¥¼ í†µí•´ ì ‘ê·¼í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
 
 		// ----------------------------------------------------------
-		// ¿©±â¿¡ ORB Feature¸¦ ÃßÃâÇÏ´Â ÄÚµå¸¦ ÀÛ¼ºÇÏ¼¼¿ä
+		// ì—¬ê¸°ì— ORB Featureë¥¼ ì¶”ì¶œí•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±í•˜ì„¸ìš”
 		std::vector<cv::KeyPoint> keyPoints;
 		cv::Mat descriptors;
 
+		this->feature->detectAndCompute(in_frame, cv::Mat(), keyPoints, descriptors);
 		// ----------------------------------------------------------
 
 
 		// ----------------------------------------------------------
-		// ¿©±â¿¡ ORB Feature MatchingÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ÀÛ¼ºÇÏ¼¼¿ä
+		// ì—¬ê¸°ì— ORB Feature Matchingì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±í•˜ì„¸ìš”
 		std::vector<cv::DMatch> matches;
+
+		this->matcher.match(this->targetDescriptors, descriptors, matches);
 
 		// ----------------------------------------------------------
 
 		FilterBadMatches(matches);
 		
 		// ----------------------------------------------------------
-		// ¿©±â¿¡ Pose EstimationÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ÀÛ¼ºÇÏ¼¼¿ä
+		// ì—¬ê¸°ì— Pose Estimationì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±í•˜ì„¸ìš”
 		cv::Vec3d rvec, tvec;
 		std::vector<cv::Point3f> objectPoints;
 		std::vector<cv::Point2f> imagePoints;
+
+		for (int i = 0; i < matches.size(); i++)
+		{
+			cv::Point2f objectPoint2D = this->targetKeyPoints[matches[i].queryIdx].pt;
+			cv::Point3f objectPoint = cv::Point3f(objectPoint2D.x, objectPoint2D.y, 0);
+			
+			cv::Point2f imagePoint = keyPoints[matches[i].trainIdx].pt;
+			
+			objectPoints.push_back(objectPoint);
+			imagePoints.push_back(imagePoint);
+		}
+
+		cv::Mat imgMatches;
+		cv::drawMatches(this->targetImageGray, this->targetKeyPoints, in_frame, keyPoints, matches, imgMatches);
+		cv::imshow("Matches", imgMatches);
 
 		// ----------------------------------------------------------
 

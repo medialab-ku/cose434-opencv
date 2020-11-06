@@ -36,8 +36,8 @@ namespace GL
 	const std::string PATH_TEAPOT_FRAG_SHADER = "res\\teapot\\teapot.frag";
 	const std::string PATH_TEAPOT_MODEL = "res\\teapot\\teapot.obj";
 	const std::string PATH_TEAPOT_TEXTURE = "res\\teapot\\texture.jpg";
-	const unsigned int SCR_WIDTH = 1280;
-	const unsigned int SCR_HEIGHT = 720;
+	const unsigned int SCR_WIDTH = 1000;
+	const unsigned int SCR_HEIGHT = 750;
 	const float ZFAR = 10000.0f;
 	const float ZNEAR = 0.00001f;
 	const int FEATURE_TYPE_MARKER = 0;

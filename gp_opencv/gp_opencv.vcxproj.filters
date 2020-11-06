@@ -59,4 +59,38 @@
       <Filter>리소스 파일</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\calibration\0.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\1.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\2.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\3.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\4.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\5.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\6.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\7.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\calibration\8.JPG">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\marker-test\test.mp4">
+      <Filter>리소스 파일</Filter>
+    </Media>
+  </ItemGroup>
 </Project>
