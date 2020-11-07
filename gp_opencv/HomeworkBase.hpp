@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "GL.hpp"
@@ -124,7 +124,7 @@ public:
 protected:
 	void CalibrateCamera(cv::Mat& out_cameraMatrix, cv::Mat& out_distCoeffs)
 	{
-		// ÇÊ¿äÇÒ °æ¿ì °ªÀ» ¼öÁ¤ÇÏ¿© »ç¿ëÇÏ¼¼¿ä
+		// í•„ìš”í•œ ê²½ìš° ê°’ì„ ìˆ˜ì •í•˜ì—¬ ì‚¬ìš©í•˜ì„¸ìš”
 		const cv::Size NUM_CORNERS = cv::Size(8, 6);
 		const float CALIB_SQUARE_SIZE = 25; // mm
 		const int NUM_CALIB_IMAGES = 7;
@@ -132,11 +132,53 @@ protected:
 
 		// ------------------------------------------------------------------------
 		//
-		// ÁÖ¾îÁø ÄÚµå¸¦ Âü°íÇÏ¿©
-		// Camera CalibrationÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ¿©±â¿¡ ÀÛ¼ºÇÏ¼¼¿ä
-		// °á°ú°ªÀº °¢°¢ out_cameraMatrix, out_distCoeffs ¸Å°³º¯¼ö¿¡ ´ëÀÔÇÏ¼¼¿ä
+		// ì£¼ì–´ì§„ ì½”ë“œë¥¼ ì°¸ê³ í•˜ì—¬
+		// Camera Calibrationì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì—¬ê¸°ì— ì‘ì„±í•˜ì„¸ìš”
+		// ê²°ê³¼ê°’ì€ ê°ê° out_cameraMatrix, out_distCoeffs ë§¤ê°œë³€ìˆ˜ì— ëŒ€ì…í•˜ì„¸ìš”
 		//
 		// ------------------------------------------------------------------------
+		std::vector<std::vector<cv::Point3f>>list_of_object_points;
+		std::vector<std::vector<cv::Point2f>>list_of_image_points;
+
+		std::vector<cv::Point3f> object_points; // qê°’
+		for (int i = 0; i < NUM_CORNERS.height; ++i) {
+			for (int j = 0; j < NUM_CORNERS.width; ++j) {
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+			}
+		}
+
+		for (int idx = 1; idx <= NUM_CALIB_IMAGES; ++idx) {
+			std::stringstream file_name;
+			file_name << "img/" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str(), cv::IMREAD_GRAYSCALE);
+
+			if (image.empty())
+			{
+				std::cout << "Couldn't read " << idx << ".jpg" << std::endl;
+				return;
+			}
+
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+
+			if (found) {
+				list_of_image_points.push_back(image_points);
+				list_of_object_points.push_back(object_points);
+			}
+		}
+
+		std::vector<cv::Mat> rvecs, tvecs;
+		double rms = cv::calibrateCamera(
+			list_of_object_points,
+			list_of_image_points,
+			CALIB_IMAGE_SIZE,
+			out_cameraMatrix,
+			out_distCoeffs,
+			rvecs,
+			tvecs
+		);
 	}
 
 	// Grab image from the video, create texture and generate mipmaps

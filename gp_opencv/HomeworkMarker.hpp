@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "HomeworkBase.hpp"
 
@@ -25,11 +25,37 @@ protected:
 	{
 		/////////////////////////////////////////////////////////////////////////////////////////
 		//
-		// ¸â¹ö º¯¼ö¸¦ Âü°íÇÏ¿© Marker Detection ¹× Pose EstimationÀ» ¼öÇàÇÏ´Â ÄÚµå¸¦ ÀÛ¼ºÇÏ¼¼¿ä
-		// ÇöÀç ÇÁ·¹ÀÓÀÇ ÀÌ¹ÌÁö´Â in_frame ¸Å°³º¯¼ö¸¦ ÅëÇØ Á¢±ÙÇÒ ¼ö ÀÖ½À´Ï´Ù
-		// °á°ú°ªÀº °¢°¢ out_rvec, out_tvec ¸Å°³º¯¼ö¿¡ ´ëÀÔÇÏ¼¼¿ä
+		// ë©¤ë²„ ë³€ìˆ˜ë¥¼ ì°¸ê³ í•˜ì—¬ Marker Detection ë° Pose Estimationì„ ìˆ˜í–‰í•˜ëŠ” ì½”ë“œë¥¼ ì‘ì„±í•˜ì„¸ìš”
+		// í˜„ì¬ í”„ë ˆì„ì˜ ì´ë¯¸ì§€ëŠ” in_frame ë§¤ê°œë³€ìˆ˜ë¥¼ í†µí•´ ì ‘ê·¼í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤
+		// ê²°ê³¼ê°’ì€ ê°ê° out_rvec, out_tvec ë§¤ê°œë³€ìˆ˜ì— ëŒ€ì…í•˜ì„¸ìš”
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
+		std::vector<int> markerIds;
+		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+		cv::aruco::detectMarkers(
+			in_frame,
+			dictionary,
+			markerCorners,
+			markerIds,
+			detectorParams,
+			rejectedCandidates,
+			cameraMatrix,
+			distCoeffs
+		);
+
+		if (markerIds.size() > 0) {
+			std::vector<cv::Vec3d> rvecs, tvecs;
+			cv::aruco::estimatePoseSingleMarkers(
+				markerCorners,
+				0.03,
+				cameraMatrix,
+				distCoeffs,
+				rvecs,
+				tvecs
+			);
+			out_rvec = rvecs[0];
+			out_tvec = tvecs[0];
+		}
 	}
 
 private:
