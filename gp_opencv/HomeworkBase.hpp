@@ -130,13 +130,48 @@ protected:
 		const int NUM_CALIB_IMAGES = 7;
 		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
 
-		// ------------------------------------------------------------------------
-		//
-		// 주어진 코드를 참고하여
-		// Camera Calibration을 수행하는 코드를 여기에 작성하세요
-		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
-		//
-		// ------------------------------------------------------------------------
+		std::vector<std::vector<cv::Point2f>> list_of_image_points;
+		std::vector<std::vector<cv::Point3f>> list_of_object_points;
+
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; ++i)
+		{
+			for (int j = 0; j < NUM_CORNERS.width; ++j)
+			{
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+			}
+		}
+
+		for (unsigned int idx = 1; idx <= NUM_CALIB_IMAGES; ++idx)
+		{
+			std::stringstream file_name;
+			file_name << "img/" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str());
+
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+
+			if (found)
+			{
+				list_of_image_points.push_back(image_points);
+				list_of_object_points.push_back(object_points);
+			}
+		}
+
+		cv::Mat camera_matrix, dist_coefficients;
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		camera_matrix = cv::Mat::eye(3, 3, CV_64F);
+		dist_coefficients = cv::Mat::zeros(8, 1, CV_64F);
+
+		double rms = cv::calibrateCamera(
+			list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE,
+			camera_matrix, dist_coefficients, rvecs, tvecs);
+
+		out_cameraMatrix = camera_matrix;
+		out_distCoeffs = dist_coefficients;
 	}
 
 	// Grab image from the video, create texture and generate mipmaps
