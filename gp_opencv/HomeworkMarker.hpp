@@ -23,7 +23,7 @@ protected:
 
 	void EstimatePose(cv::Mat in_frame, cv::Vec3d& out_rvec, cv::Vec3d& out_tvec)
 	{
-		const float WORLD_SQUARE_SIZE = 0.03; // meters
+		const float WORLD_SQUARE_SIZE = 0.10; // meters
 
 		std::vector<std::vector<cv::Point2f>> _corners;
 		std::vector<int> _ids;
@@ -34,7 +34,7 @@ protected:
 		if (_ids.empty())
 		{
 			out_rvec = cv::Vec3d(0, 0, 0);
-			out_tvec = cv::Vec3d(0, 0, 0);
+			out_tvec = cv::Vec3d(-10, -10, -10);
 			return;
 		}
 
@@ -45,19 +45,12 @@ protected:
 		if (rvecs.empty() || tvecs.empty())
 		{
 			out_rvec = cv::Vec3d(0, 0, 0);
-			out_tvec = cv::Vec3d(0, 0, 0);
+			out_tvec = cv::Vec3d(-10, -10, -10);
 			return;
 		}
 
 		out_rvec = rvecs.at(0);
 		out_tvec = tvecs.at(0);
-		/////////////////////////////////////////////////////////////////////////////////////////
-		//
-		// 멤버 변수를 참고하여 Marker Detection 및 Pose Estimation을 수행하는 코드를 작성하세요
-		// 현재 프레임의 이미지는 in_frame 매개변수를 통해 접근할 수 있습니다
-		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
-		//
-		/////////////////////////////////////////////////////////////////////////////////////////
 	}
 
 private:
