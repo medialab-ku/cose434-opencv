@@ -23,7 +23,7 @@ protected:
 
 	void EstimatePose(cv::Mat in_frame, cv::Vec3d& out_rvec, cv::Vec3d& out_tvec)
 	{
-		const float WORLD_SQUARE_SIZE = 0.10; // meters
+		const float WORLD_SQUARE_SIZE = 0.20; // meters
 
 		std::vector<std::vector<cv::Point2f>> _corners;
 		std::vector<int> _ids;

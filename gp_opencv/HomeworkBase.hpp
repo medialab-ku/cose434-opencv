@@ -126,7 +126,7 @@ protected:
 	{
 		// 필요할 경우 값을 수정하여 사용하세요
 		const cv::Size NUM_CORNERS = cv::Size(8, 6);
-		const float CALIB_SQUARE_SIZE = 22; // mm
+		const float CALIB_SQUARE_SIZE = 20; // mm
 		const int NUM_CALIB_IMAGES = 7;
 		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
 
