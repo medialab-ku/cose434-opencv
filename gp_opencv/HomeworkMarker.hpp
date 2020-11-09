@@ -23,13 +23,22 @@ protected:
 
 	void EstimatePose(cv::Mat in_frame, cv::Vec3d& out_rvec, cv::Vec3d& out_tvec)
 	{
-		/////////////////////////////////////////////////////////////////////////////////////////
-		//
-		// 멤버 변수를 참고하여 Marker Detection 및 Pose Estimation을 수행하는 코드를 작성하세요
-		// 현재 프레임의 이미지는 in_frame 매개변수를 통해 접근할 수 있습니다
-		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
-		//
-		/////////////////////////////////////////////////////////////////////////////////////////
+		try {
+			std::vector<int> markerIds;
+			std::vector<std::vector<cv::Point2f>> markerCorners;
+			std::vector<cv::Vec3d> rvecs, tvecs;
+			cv::aruco::detectMarkers(in_frame, dictionary, markerCorners, markerIds, detectorParams);
+			cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+			if (markerIds.size() > 0) {
+				out_rvec = rvecs[0];
+				out_tvec = tvecs[0];
+				cv::aruco::drawAxis(in_frame, cameraMatrix, distCoeffs, out_rvec, out_tvec, 0.1);
+				cv::imshow("out", in_frame);
+			}
+		}
+		catch (cv::Exception& e) {
+			std::cerr << e.msg << std::endl;
+		}
 	}
 
 private:

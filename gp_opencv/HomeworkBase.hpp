@@ -130,13 +130,46 @@ protected:
 		const int NUM_CALIB_IMAGES = 7;
 		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
 
-		// ------------------------------------------------------------------------
-		//
-		// 주어진 코드를 참고하여
-		// Camera Calibration을 수행하는 코드를 여기에 작성하세요
-		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
-		//
-		// ------------------------------------------------------------------------
+		std::vector<std::vector<cv::Point2f>> list_of_img_points;
+		std::vector<std::vector<cv::Point3f>> list_of_obj_points;
+
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		try {
+			for (unsigned int i = 1; i <= NUM_CALIB_IMAGES; i++) {
+				std::stringstream fname;
+				fname << "res\\calibration\\" << i << ".jpg";
+				cv::Mat image = cv::imread(fname.str());
+
+				std::vector<cv::Point2f> image_points;
+				bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points,
+					cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
+				if (found) {
+					list_of_img_points.push_back(image_points);
+					list_of_obj_points.push_back(object_points);
+				}
+			}
+
+			out_cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+			out_distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+			std::vector<cv::Mat> rvecs, tvecs;
+
+			cv::calibrateCamera(list_of_obj_points, list_of_img_points, NUM_CORNERS,
+				out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
+
+			std::cout << "cameratMatrix:\n" << out_cameraMatrix << "\n";
+			std::cout << "distCoeffs:\n" << out_distCoeffs << "\n";
+			std::cout << "rotation:\n";
+			for (const auto& v : rvecs) std::cout << v << "\n";
+			std::cout << "translation:\n";
+			for (const auto& v : tvecs) std::cout << v << "\n";
+		}
+		catch (cv::Exception& e) {
+			std::cerr << e.msg << std::endl;
+		}
 	}
 
 	// Grab image from the video, create texture and generate mipmaps
