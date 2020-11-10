@@ -32,8 +32,6 @@ protected:
 			if (markerIds.size() > 0) {
 				out_rvec = rvecs[0];
 				out_tvec = tvecs[0];
-				cv::aruco::drawAxis(in_frame, cameraMatrix, distCoeffs, out_rvec, out_tvec, 0.1);
-				cv::imshow("out", in_frame);
 			}
 		}
 		catch (cv::Exception& e) {
