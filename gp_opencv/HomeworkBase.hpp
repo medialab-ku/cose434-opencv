@@ -130,6 +130,41 @@ protected:
 		const int NUM_CALIB_IMAGES = 7;
 		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
 
+		std::vector<std::vector<cv::Point2f>> list_of_image_points;
+		std::vector<std::vector<cv::Point3f>> list_of_object_points;
+
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		for (unsigned int idx = 1; idx <= NUM_CALIB_IMAGES; idx++) {
+			std::stringstream file_name;
+			file_name << "img/" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str());
+
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+
+			if (found) {
+				// std::cout << image_points << std::endl;
+				list_of_image_points.push_back(image_points);
+				list_of_object_points.push_back(object_points);
+			}
+		}
+
+		cv::Mat camera_matrix = cv::Mat::eye(3, 3, CV_64F);
+		cv::Mat dist_coefficients = cv::Mat::zeros(8, 1, CV_64F);
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		double rms = cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, camera_matrix, dist_coefficients, rvecs, tvecs);
+
+		out_cameraMatrix = camera_matrix;
+		out_distCoeffs = dist_coefficients;
+
+		
 		// ------------------------------------------------------------------------
 		//
 		// 주어진 코드를 참고하여
