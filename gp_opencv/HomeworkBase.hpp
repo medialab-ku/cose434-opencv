@@ -157,7 +157,7 @@ protected:
 			out_distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 			std::vector<cv::Mat> rvecs, tvecs;
 
-			cv::calibrateCamera(list_of_obj_points, list_of_img_points, NUM_CORNERS,
+			cv::calibrateCamera(list_of_obj_points, list_of_img_points, CALIB_IMAGE_SIZE,
 				out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
 
 			std::cout << "cameratMatrix:\n" << out_cameraMatrix << "\n";
