@@ -137,6 +137,33 @@ protected:
 		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
 		//
 		// ------------------------------------------------------------------------
+		std::vector<std::vector<cv::Point2f>> list_image_points;
+		std::vector<std::vector<cv::Point3f>> list_object_points;
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+		{
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+		}
+		for (unsigned int idx = 1; idx <= NUM_CALIB_IMAGES; idx += 1)
+		{
+			std::stringstream file_name;
+			file_name << "img/" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str());
+
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+
+			if (found)
+			{
+				list_image_points.push_back(image_points);
+				list_object_points.push_back(object_points);
+			}
+		}
+		std::vector<cv::Mat> rvecs, tvecs;
+		double rms = cv::calibrateCamera(list_object_points, list_image_points, CALIB_IMAGE_SIZE, out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
 	}
 
 	// Grab image from the video, create texture and generate mipmaps
