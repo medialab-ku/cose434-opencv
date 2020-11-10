@@ -71,7 +71,6 @@ public:
 			{
 				cv::Vec3d rvec, tvec;
 				this->EstimatePose(frame, rvec, tvec);
-
 				if (renderTeapot)
 				{
 					cv::Mat rot;
@@ -126,9 +125,9 @@ protected:
 	{
 		// 필요할 경우 값을 수정하여 사용하세요
 		const cv::Size NUM_CORNERS = cv::Size(8, 6);
-		const float CALIB_SQUARE_SIZE = 25; // mm
+		const float CALIB_SQUARE_SIZE = 20; // mm
 		const int NUM_CALIB_IMAGES = 7;
-		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
+		const cv::Size CALIB_IMAGE_SIZE = cv::Size(720, 960);
 
 		// ------------------------------------------------------------------------
 		//
@@ -137,6 +136,34 @@ protected:
 		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
 		//
 		// ------------------------------------------------------------------------
+		std::vector<std::vector<cv::Point3f>> list_of_object_points;
+		std::vector<std::vector<cv::Point2f>> list_of_image_points;
+		std::vector<cv::Point3f> object_points;
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		for (int i = 0; i < NUM_CALIB_IMAGES; i++)
+		{
+			std::stringstream filename;
+			filename << "res/img/" << i << ".jpg";
+			cv::Mat image;
+			image = cv::imread(filename.str());
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+			if (found)
+			{
+				list_of_object_points.push_back(object_points);
+				list_of_image_points.push_back(image_points);
+			}
+		}
+		cv::Mat cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+		cv::Mat distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+		double rms = cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, cameraMatrix, distCoeffs, rvecs, tvecs);
+		out_cameraMatrix = cameraMatrix;
+		out_distCoeffs = distCoeffs;
 	}
 
 	// Grab image from the video, create texture and generate mipmaps
