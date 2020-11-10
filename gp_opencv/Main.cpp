@@ -4,8 +4,8 @@
 int main()
 {
 	HomeworkBase *app;
-	app = new HomeworkMarker();
-	//app = new HomeworkNatural();
+	//app = new HomeworkMarker();
+	app = new HomeworkNatural();
 	
 	app->Run();
 

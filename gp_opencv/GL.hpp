@@ -111,7 +111,7 @@ namespace GL
 			break;
 
 		case FEATURE_TYPE_NATURAL:
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.15, 0, 0.09));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(0.08, 0, 0.09));
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(0.001f, 0.001f, 0.001f));
 			break;
 		}
