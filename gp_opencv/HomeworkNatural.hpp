@@ -43,13 +43,16 @@ protected:
 		std::vector<cv::KeyPoint> keyPoints;
 		cv::Mat descriptors;
 
+		this->feature->detectAndCompute(in_frame, cv::Mat(), keyPoints, descriptors);
+
 		// ----------------------------------------------------------
 
 
 		// ----------------------------------------------------------
 		// 여기에 ORB Feature Matching을 수행하는 코드를 작성하세요
 		std::vector<cv::DMatch> matches;
-
+		
+		this->matcher.match(this->targetDescriptors, descriptors, matches);
 		// ----------------------------------------------------------
 
 		FilterBadMatches(matches);
@@ -59,10 +62,22 @@ protected:
 		cv::Vec3d rvec, tvec;
 		std::vector<cv::Point3f> objectPoints;
 		std::vector<cv::Point2f> imagePoints;
+		//std::cout << matches.size() << std::endl;
+		for (int i = 0; i < matches.size(); i++)
+		{
+			objectPoints.push_back(cv::Point3f(this->targetKeyPoints[matches[i].queryIdx].pt.x,
+				this->targetKeyPoints[matches[i].queryIdx].pt.y,0));
+			
+			imagePoints.push_back(keyPoints[matches[i].trainIdx].pt);
 
-		// ----------------------------------------------------------
 
+
+		}
+		//std::cout << objectPoints << std::endl;
+		//std::cout << imagePoints << std::endl;
 		cv::solvePnPRansac(objectPoints, imagePoints, this->cameraMatrix, this->distCoeffs, out_rvec, out_tvec);
+		
+		
 	}
 
 	void FilterBadMatches(std::vector<cv::DMatch> &matches)
