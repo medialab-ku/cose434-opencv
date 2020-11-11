@@ -29,6 +29,16 @@ protected:
 		// 현재 프레임의 이미지는 in_frame 매개변수를 통해 접근할 수 있습니다
 		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
 		//
+		std::vector<std::vector<cv::Point2f>>_corners;
+		std::vector<std::vector<cv::Point>> _ids;
+		std::vector<std::vector<cv::Point2f>> _rejectedImgPoints;
+		cv::aruco::detectMarkers(in_frame, &this->dictionary, _corners, _ids, &this->detectorParams, _rejectedImgPoints, this->cameraMatrix, this->distCoeffs);
+		
+		std::vector<cv::OutputArray> _objPoints;
+		cv::Vec3d _rvecs, _tvecs;
+		cv::aruco::estimatePoseSingleMarkers(_corners, 68.0f, this->cameraMatrix, this->distCoeffs, _rvecs, _tvecs, _objPoints);
+		out_rvec = _rvecs;
+		out_tvec = _tvecs;
 		/////////////////////////////////////////////////////////////////////////////////////////
 	}
 
