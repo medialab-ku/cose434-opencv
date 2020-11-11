@@ -140,7 +140,7 @@ protected:
 
 		std::vector<cv::Point3f> object_points;
 		for (int i = 0; i < NUM_CORNERS.height; i++)
-			for (int j = -; j < NUM_CORNERS.width; j++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
 				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
 
 		std::vector<std::vector<cv::Point3f>> list_of_object_points;
@@ -166,7 +166,7 @@ protected:
 		out_cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
 		out_distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
 
-		double rms = cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
+		cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
 	}
 
 	// Grab image from the video, create texture and generate mipmaps

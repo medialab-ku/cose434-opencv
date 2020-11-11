@@ -31,11 +31,13 @@ protected:
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
 		std::vector<int> markerIds;
-		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
-		const float CALIB_SQUARE_SIZE = 25; // mm
+		std::vector<std::vector<cv::Point2f>> markerCorners;
+		std::vector<cv::Vec3d> rvecs, tvecs;
 
-		cv::aruco::detectMarkers(in_frame, this->dictionary, markerCorners, markerIds, this->detectorParams, rejectedCandidates);
-		cv::aruco::estimatePoseSingleMarkers(markerCorners, CALIB_SQUARE_SIZE, this->cameraMatrix, this->distCoeffs, out_rvec, out_tvec);
+		cv::aruco::detectMarkers(in_frame, dictionary, markerCorners, markerIds, detectorParams);
+		cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.06, cameraMatrix, distCoeffs, rvecs, tvecs);
+		out_rvec = rvecs[0];
+		out_tvec = tvecs[0];
 	}
 
 private:
