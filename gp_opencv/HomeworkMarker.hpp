@@ -30,6 +30,12 @@ protected:
 		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
+		std::vector<int> markerIds;
+		std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
+		const float CALIB_SQUARE_SIZE = 25; // mm
+
+		cv::aruco::detectMarkers(in_frame, this->dictionary, markerCorners, markerIds, this->detectorParams, rejectedCandidates);
+		cv::aruco::estimatePoseSingleMarkers(markerCorners, CALIB_SQUARE_SIZE, this->cameraMatrix, this->distCoeffs, out_rvec, out_tvec);
 	}
 
 private:

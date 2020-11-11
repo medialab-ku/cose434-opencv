@@ -29,12 +29,12 @@ public:
 		this->CalibrateCamera(this->cameraMatrix, this->distCoeffs);
 		this->Init();
 
-		if (!GL::Init(cameraMatrix.at<double>(0, 0), 
-						cameraMatrix.at<double>(1, 1), 
-						cameraMatrix.at<double>(0, 2), 
-						cameraMatrix.at<double>(1, 2), 
-						this->featureType)) 
-						return;
+		if (!GL::Init(cameraMatrix.at<double>(0, 0),
+			cameraMatrix.at<double>(1, 1),
+			cameraMatrix.at<double>(0, 2),
+			cameraMatrix.at<double>(1, 2),
+			this->featureType))
+			return;
 		if (!GL::CreateBackground()) return;
 		if (!GL::CreateTeapot()) return;
 		glUseProgram(0);
@@ -137,10 +137,40 @@ protected:
 		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
 		//
 		// ------------------------------------------------------------------------
+
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = -; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		std::vector<std::vector<cv::Point3f>> list_of_object_points;
+		std::vector<std::vector<cv::Point2f>> list_of_image_points;
+
+		for (unsigned int idx = 1; idx <= NUM_CALIB_IMAGES; idx += 1) {
+			std::stringstream file_name;
+			file_name << "res\\" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str());
+
+			std::vector<cv::Point2f> image_points;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points);
+
+			if (found) {
+				list_of_object_points.push_back(object_points);
+				list_of_image_points.push_back(image_points);
+			}
+		}
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		out_cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
+		out_distCoeffs = cv::Mat::zeros(8, 1, CV_64F);
+
+		double rms = cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, out_cameraMatrix, out_distCoeffs, rvecs, tvecs);
 	}
 
 	// Grab image from the video, create texture and generate mipmaps
-	bool GrabVideo(cv::VideoCapture &video, cv::Mat &frame)
+	bool GrabVideo(cv::VideoCapture& video, cv::Mat& frame)
 	{
 		video.read(frame);
 		if (frame.empty()) {
@@ -159,7 +189,7 @@ protected:
 	}
 
 	virtual void Init() = 0;
-	virtual void EstimatePose(cv::Mat in_frame, cv::Vec3d &out_rvec, cv::Vec3d &out_tvec) = 0;
+	virtual void EstimatePose(cv::Mat in_frame, cv::Vec3d& out_rvec, cv::Vec3d& out_tvec) = 0;
 
 protected:
 	int featureType;
