@@ -30,6 +30,20 @@ protected:
 		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
+
+
+			std::vector< int > ids;
+			std::vector< std::vector< cv::Point2f> > corners, rejected;
+			std::vector< cv::Vec3d > rvecs, tvecs;
+			cv::aruco::detectMarkers(in_frame, dictionary, corners, ids, detectorParams, rejected);
+			if (ids.size() > 0)
+			{
+				cv::aruco::estimatePoseSingleMarkers(corners, 0.069, cameraMatrix, distCoeffs, rvecs, tvecs);
+			}
+
+			out_rvec = rvecs;
+			out_tvec = tvecs;
+		
 	}
 
 private:
