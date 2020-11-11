@@ -35,10 +35,17 @@ protected:
 		std::vector<cv::Vec3d> _rvecs, _tvecs;
 		cv::aruco::detectMarkers(in_frame, this->dictionary, _corners, _ids, this->detectorParams, _rejectedImgPoints, this->cameraMatrix, this->distCoeffs);
 		if (_ids.size() > 0) {
-			cv::aruco::drawDetectedMarkers(in_frame, _corners, _ids);
+			std::cout << "ID is" << _ids[0] << std::endl;
+			std::cout << "Corner is " << _corners[0] << std::endl;
+
+			cv::aruco::drawDetectedMarkers(in_frame, _corners, _ids,10.0f);
 			
 			cv::aruco::estimatePoseSingleMarkers(_corners, 68.0f, this->cameraMatrix, this->distCoeffs, _rvecs, _tvecs);
+			cv::aruco::drawAxis(in_frame, this->cameraMatrix, this->distCoeffs, _rvecs[0], _tvecs[0], 10.0f);
+			std::cout << "1th rvecs is " << _rvecs[0] << std::endl;
 			
+			out_rvec = _rvecs[0];
+			out_tvec = _tvecs[0];
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////
