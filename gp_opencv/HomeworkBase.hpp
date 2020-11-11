@@ -127,7 +127,7 @@ protected:
 		// 필요할 경우 값을 수정하여 사용하세요
 		const cv::Size NUM_CORNERS = cv::Size(8, 6);
 		const float CALIB_SQUARE_SIZE = 25; // mm
-		const int NUM_CALIB_IMAGES = 7;
+		const int NUM_CALIB_IMAGES = 9;
 		const cv::Size CALIB_IMAGE_SIZE = cv::Size(1280, 720);
 
 		// ------------------------------------------------------------------------
@@ -137,6 +137,47 @@ protected:
 		// 결과값은 각각 out_cameraMatrix, out_distCoeffs 매개변수에 대입하세요
 		//
 		// ------------------------------------------------------------------------
+
+		// 먼저 각 코너점을 찾은 뒤에 calibration
+		std::vector<cv::Point3f> object_points;
+		for (int i = 0; i < NUM_CORNERS.height; i++)
+			for (int j = 0; j < NUM_CORNERS.width; j++)
+				object_points.push_back(cv::Point3f(j * CALIB_SQUARE_SIZE, i * CALIB_SQUARE_SIZE, 0));
+
+		std::vector<std::vector<cv::Point3f>>  list_of_object_points;
+		std::vector<std::vector<cv::Point2f>>  list_of_image_points;
+
+		for (unsigned int idx = 1; idx <= NUM_CALIB_IMAGES; idx++) {
+			std::stringstream file_name;
+			file_name << "res/" << idx << ".jpg";
+
+			cv::Mat image;
+			image = cv::imread(file_name.str());
+
+			// 2차원 좌표
+			std::vector<cv::Point2f> image_points;
+			int chessBoardFlags = cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE | cv::CALIB_CB_FAST_CHECK;
+			bool found = cv::findChessboardCorners(image, NUM_CORNERS, image_points, chessBoardFlags);
+
+			if (found) {
+				list_of_image_points.push_back(image_points);
+				list_of_object_points.push_back(object_points);
+			}
+		}
+		
+		cv::Mat camera_matrix, dist_coefficients;
+		// 각 사진의 카메라 [R|t]
+		std::vector<cv::Mat> rvecs, tvecs;
+
+		camera_matrix = cv::Mat::eye(3, 3, CV_64F);
+		dist_coefficients = cv::Mat::zeros(8, 1, CV_64F);
+
+		// 칼리브레이션. 결과는 camera_matrix에 저장됨
+		// intrinsic matrix
+		double rms = cv::calibrateCamera(list_of_object_points, list_of_image_points, CALIB_IMAGE_SIZE, camera_matrix, dist_coefficients, rvecs, tvecs);
+
+		out_cameraMatrix = camera_matrix.clone();
+		out_distCoeffs = dist_coefficients.clone();
 	}
 
 	// Grab image from the video, create texture and generate mipmaps

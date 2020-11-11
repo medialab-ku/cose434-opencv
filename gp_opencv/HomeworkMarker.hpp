@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include "HomeworkBase.hpp"
 
 class HomeworkMarker : public HomeworkBase
@@ -18,7 +18,7 @@ protected:
 
 		// Init pre-defined ArUco markers
 		this->detectorParams = cv::aruco::DetectorParameters::create();
-		this->dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+		this->dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
 	}
 
 	void EstimatePose(cv::Mat in_frame, cv::Vec3d& out_rvec, cv::Vec3d& out_tvec)
@@ -30,6 +30,21 @@ protected:
 		// 결과값은 각각 out_rvec, out_tvec 매개변수에 대입하세요
 		//
 		/////////////////////////////////////////////////////////////////////////////////////////
+
+		// detect marker
+		std::vector<int> ids;
+		std::vector<std::vector<cv::Point2f>> corners, rejected;
+		std::vector<cv::Vec3d> rvecs, tvecs;
+
+		cv::aruco::detectMarkers(in_frame, dictionary, corners, ids, detectorParams, rejected);
+
+		if (ids.size() > 0) {
+			cv::aruco::estimatePoseSingleMarkers(corners, (float)(0.07), cameraMatrix, distCoeffs, rvecs, tvecs);
+
+			// single marker
+			out_rvec = rvecs[0];
+			out_tvec = tvecs[0];
+		}
 	}
 
 private:
