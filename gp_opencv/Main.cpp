@@ -7,7 +7,11 @@ int main()
 	app = new HomeworkMarker();
 	//app = new HomeworkNatural();
 	
+	
+
 	app->Run();
+
+	
 
 	return 0;
 }
